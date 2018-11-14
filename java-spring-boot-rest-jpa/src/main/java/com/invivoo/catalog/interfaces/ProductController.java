@@ -18,18 +18,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/catalog/product", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProductController {
 
     private final static Logger logger = LoggerFactory.getLogger(ProductController.class);
 
-    @Autowired
     private ProductRepository productRepository;
 
-    @GetMapping
+    @Autowired
+    public ProductController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @GetMapping("s")
     public ResponseEntity<List<Product>> getAll() {
         logger.debug("GET products");
         return ResponseEntity.ok(productRepository.findAll());
@@ -38,11 +41,10 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<Product> get(@PathVariable Long id) {
         logger.debug("GET products/{}", id);
-        Optional<Product> optionalProduct = productRepository.findById(id);
-        if (!optionalProduct.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(optionalProduct.get());
+        return productRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+
     }
 
     @PostMapping

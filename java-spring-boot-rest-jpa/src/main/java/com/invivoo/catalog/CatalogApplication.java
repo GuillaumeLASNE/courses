@@ -23,8 +23,12 @@ public class CatalogApplication implements ApplicationRunner {
         SpringApplication.run(CatalogApplication.class, args);
     }
 
-    @Autowired
     private AppProperties appProperties;
+
+    @Autowired
+    public CatalogApplication(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
 
     @Value("${server.port}")
     private String port;
@@ -34,11 +38,11 @@ public class CatalogApplication implements ApplicationRunner {
         logger.info("Welcome to {} ! Application started on port {}", appProperties.getName(), port);
         logger.info(appProperties.getDescription());
         logger.info("Your application started with options : {}",
-                    args.getOptionNames()
+                args.getOptionNames()
                         .stream()
                         .map(name -> String.format("%s=%s", name, args.getOptionValues(name)
-                                                                      .stream()
-                                                                      .reduce((value1, value2) -> String.format("%s,%s", value1, value2)).get()))
+                                .stream()
+                                .reduce((value1, value2) -> String.format("%s,%s", value1, value2)).get()))
                         .collect(Collectors.toList()));
     }
 
